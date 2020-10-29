@@ -2,8 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
-using Accord.Audio;
-using Accord.Audio.Formats;
 using Xamarin.Essentials;
 
 namespace InzProjTest.Core.Helpers

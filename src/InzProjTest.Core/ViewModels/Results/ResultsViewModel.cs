@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using Accord.Audio;
-using Accord.Math;
+using MathNet.Numerics;
+using MathNet.Numerics.IntegralTransforms;
 using MvvmCross.Commands;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
@@ -14,13 +14,13 @@ using OxyPlot.Series;
 
 namespace InzProjTest.Core.ViewModels.Results
 {
-    public class ResultsViewModel : BaseViewModel<ComplexSignal>
+    public class ResultsViewModel : BaseViewModel<Complex32[]>
     {
         private readonly IMvxNavigationService _navigationService;
 
         #region Properties
 
-        public ComplexSignal FftData { get; set; }
+        public Complex32[] FftData { get; set; }
 
         #endregion
 
@@ -30,16 +30,14 @@ namespace InzProjTest.Core.ViewModels.Results
         }
         public PlotModel PlotModel => GeneratePlotModel();
 
-        private PlotModel GeneratePlotModel()
+        private PlotModel GeneratePlotModel() //todo asynchroniczna zeby nie blokować UI thread
         {
-            var channel = FftData.GetChannel(0);
-            var magnitude=  Accord.Audio.Tools.GetMagnitudeSpectrum(channel);
-            var freq = Accord.Audio.Tools.GetFrequencyVector(channel.Length, FftData.SampleRate);
-            magnitude[0] = 0; 
-            float[] g = new float[magnitude.Length];
-            for (int i = 0; i < magnitude.Length; i++)
-                g[i] = (float)magnitude[i];
-
+            float[] magnitude = new float[FftData.Length];
+            for (int i = 0; i < FftData.Length; i++)
+            {
+                magnitude[i] = FftData[i].MagnitudeSquared;
+            }
+            var freq = Fourier.FrequencyScale(FftData.Length, 44100); //todo przenoszenie sampleRate, ogarniecie skali na x (screenshot YT)
             var model = new PlotModel
             {
                 PlotAreaBorderColor = OxyColors.Black,
@@ -66,16 +64,14 @@ namespace InzProjTest.Core.ViewModels.Results
                 MarkerStroke = OxyColors.Red,
                 Color = OxyColors.Red
             };
-            for (int i = 0; i < g.Length; i++)
+            for (int i = 0; i < magnitude.Length; i++)
             {
-                series1.Points.Add(new DataPoint(freq[i],g[i]));
+                series1.Points.Add(new DataPoint(freq[i],magnitude[i]));
             }
-
             model.Series.Add(series1);
-
             return model;
         }
 
-        public override void Prepare(ComplexSignal parameter) => FftData = parameter;
+        public override void Prepare(Complex32[] parameter) => FftData = parameter;
     }
 }

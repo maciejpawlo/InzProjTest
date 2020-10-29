@@ -11,7 +11,6 @@ namespace InzProjTest.Droid
         protected override void InitializeFirstChance()
         {
             Mvx.IoCProvider.RegisterSingleton<ILocalFileHelper>(new FileHelper());
-            Mvx.IoCProvider.RegisterSingleton<IRecordAudioService>(new RecordAudioService());
             base.InitializeFirstChance();
         }
     }
