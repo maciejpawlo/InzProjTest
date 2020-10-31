@@ -68,13 +68,13 @@ namespace InzProjTest.Core.ViewModels.Main
         {
             DateTime todaysTime = DateTime.Now;
             var filename = "rec_" + $"{todaysTime:yyyyMMdd}_{todaysTime.Hour}{todaysTime.Minute}{todaysTime.Second}" + ".wav";
-
             var recorder = new AudioRecorderService()
             {
                 StopRecordingOnSilence = false,
                 TotalAudioTimeout = TimeSpan.FromSeconds(11),
                 StopRecordingAfterTimeout =  true,
                 FilePath = Mvx.IoCProvider.Resolve<ILocalFileHelper>().GetPath(filename),
+                PreferredSampleRate = 4000,
             };
             Mvx.IoCProvider.Resolve<IUserDialogs>().ShowLoading("Nagrywanie...");
             var recordTask = await recorder.StartRecording();
@@ -103,12 +103,21 @@ namespace InzProjTest.Core.ViewModels.Main
             }
             AudioFileReader reader = new AudioFileReader(FilePath); //DZIAŁA!!!!
             ISampleProvider isp = reader.ToSampleProvider();
-            float[] buffer = new float[reader.Length / 2];
+            float[] buffer;
+            switch (isp.WaveFormat.BitsPerSample) //wybor rozmiary bufora w zaleznosci od bitspersample
+            {
+                case 16:
+                    buffer = new float[reader.Length / 2];
+                    break;
+                case 32:
+                    buffer = new float[reader.Length / 4];
+                    break;
+                default:
+                    buffer = new float[reader.Length / 2];
+                    break;
+            }
             isp.Read(buffer, 0, buffer.Length);
-
-            //todo najblizsza potega dwojki
-            var window = Window.Hamming(16384);
-            Complex32[] fftInput = new Complex32[buffer.Length]; //testowo wersja z oknem
+            Complex32[] fftInput = new Complex32[buffer.Length]; //testowo wersja bez okna
             for (int i = 0; i < fftInput.Length; i++)
             {
                 fftInput[i] = new Complex32(buffer[i], 0);
@@ -116,10 +125,10 @@ namespace InzProjTest.Core.ViewModels.Main
             Mvx.IoCProvider.Resolve<IUserDialogs>().ShowLoading("Trwa analiza syngału...");
             await Task.Run(()=>
             {
-                Fourier.Forward(fftInput, FourierOptions.Matlab);
+               Fourier.Forward(fftInput, FourierOptions.Matlab);
             });
-            await _navigationService.Navigate<ResultsViewModel, Complex32[]>(fftInput);
             Mvx.IoCProvider.Resolve<IUserDialogs>().HideLoading();
+            await _navigationService.Navigate<ResultsViewModel, Complex32[]>(fftInput); //todo podzielic widmo do wyrysowania 
         }
         
     }

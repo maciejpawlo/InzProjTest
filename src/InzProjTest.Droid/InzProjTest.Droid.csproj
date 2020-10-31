@@ -53,7 +53,7 @@
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
-    <EnableProguard>true</EnableProguard>
+    <AndroidLinkTool>r8</AndroidLinkTool>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android.Export" />
@@ -73,7 +73,7 @@
     <Compile Include="Views\Main\MainContainerActivity.cs" />
     <Compile Include="Views\Main\MainFragment.cs" />
     <Compile Include="Views\Menu\MenuFragment.cs" />
-    <Compile Include="Views\Results\ResultsFragment.cs" />
+    <Compile Include="Views\Results\ResultsActivity.cs" />
     <Compile Include="Views\Settings\SettingsFragment.cs" />
     <Compile Include="Views\Splash\SplashActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
