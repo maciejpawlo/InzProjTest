@@ -34,7 +34,7 @@
         app:layout_constraintBottom_toTopOf="@id/btRecord"
         android:layout_marginBottom="60dp"
         android:gravity="center_horizontal"
-        android:textSize="20dp"/>
+        android:textSize="15dp"/>
     <Button
         android:id="@+id/btRecord"
         android:layout_width="150dp"

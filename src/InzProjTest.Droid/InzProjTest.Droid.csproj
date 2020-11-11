@@ -162,7 +162,7 @@
     </AndroidResource>
   </ItemGroup>
   <ItemGroup>
-    <AndroidResource Include="Resources\layout\fragment_results.axml">
+    <AndroidResource Include="Resources\layout\activity_results.axml">
       <SubType>Designer</SubType>
     </AndroidResource>
   </ItemGroup>

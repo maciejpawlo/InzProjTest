@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
-using InzProjTest.Core.Helpers;
 using InzProjTest.Core.Interfaces;
 using InzProjTest.Core.ViewModels.Results;
 using MvvmCross;
@@ -101,7 +101,7 @@ namespace InzProjTest.Core.ViewModels.Main
                 await Mvx.IoCProvider.Resolve<IUserDialogs>().AlertAsync("Nie wybrano żadnego pliku.", "Błąd odczytu pliku", "OK");
                 return;
             }
-            AudioFileReader reader = new AudioFileReader(FilePath); //DZIAŁA!!!!
+            AudioFileReader reader = new AudioFileReader(FilePath); //odczyt wav
             ISampleProvider isp = reader.ToSampleProvider();
             float[] buffer;
             switch (isp.WaveFormat.BitsPerSample) //wybor rozmiary bufora w zaleznosci od bitspersample
@@ -118,18 +118,66 @@ namespace InzProjTest.Core.ViewModels.Main
             }
             isp.Read(buffer, 0, buffer.Length);
             Complex32[] fftInput = new Complex32[buffer.Length]; //testowo wersja bez okna
+            Complex xd = new Complex(2,3);
+            var aaa = Complex.Abs(xd);
             for (int i = 0; i < fftInput.Length; i++)
             {
                 fftInput[i] = new Complex32(buffer[i], 0);
             }
             Mvx.IoCProvider.Resolve<IUserDialogs>().ShowLoading("Trwa analiza syngału...");
-            await Task.Run(()=>
+            var framedFft = FrameSignal(fftInput, 10);
+            float[] averagedSignal = new float[framedFft[0].Length];
+            await Task.Run(() =>
             {
-               Fourier.Forward(fftInput, FourierOptions.Matlab);
+                foreach (var signal in framedFft)
+                {
+                    Fourier.Forward(signal, FourierOptions.Matlab);
+                }
+                var magnitudes = framedFft.Select(x => x.Select(v => v.Magnitude).ToArray()).ToList();
+                averagedSignal = AverageSignal(magnitudes);
             });
             Mvx.IoCProvider.Resolve<IUserDialogs>().HideLoading();
-            await _navigationService.Navigate<ResultsViewModel, Complex32[]>(fftInput); //todo podzielic widmo do wyrysowania 
+            await _navigationService.Navigate<ResultsViewModel, float[]>(averagedSignal); //todo podzielic widmo do wyrysowania 
         }
-        
+
+        private List<Complex32[]> FrameSignal(Complex32[] fftInput, int framesCount)
+        {
+             var framedFft = fftInput.Select((x, i) => new {Index = i, Value = x})
+                .GroupBy(x => x.Index / (fftInput.Length / framesCount))
+                .Select(x => x.Select(v => v.Value).ToArray())
+                .ToList();
+             return framedFft;
+        }
+
+        private float[] AverageSignal(List<float[]> framedSignal) //TODO sprawdzic czy dziala poprawnie
+        {
+            float[] result = new float[framedSignal[0].Length];
+            float[] tmp = new float[framedSignal[0].Length];
+            for (int i = 0; i < framedSignal.Count; i++) //iterowanie po liscie
+            {
+                if (i == 0)
+                {
+                    tmp = framedSignal[0];
+                }
+                else
+                {
+                    for (int j = 0; j < framedSignal[i].Length; j++) //iterowanie po tablicy 
+                    {
+                        tmp[i] += framedSignal[i][j];
+                    }
+                }
+            }
+
+            //for (int i = 0; i < result.Length; i++)
+            //{
+            //    tmp[i] = tmp[i] / framedSignal.Count;
+            //}
+
+            result = tmp.Select(x => x / framedSignal.Count).ToArray();
+
+            //result = tmp;
+            return result;
+
+        }
     }
 }

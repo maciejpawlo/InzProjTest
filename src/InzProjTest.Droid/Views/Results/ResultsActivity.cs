@@ -5,6 +5,7 @@ using System.Text;
 using Acr.UserDialogs;
 using Android.App;
 using Android.Content;
+using Android.Content.Res;
 using Android.OS;
 using Android.Runtime;
 using Android.Util;
@@ -21,7 +22,7 @@ namespace InzProjTest.Droid.Views.Results
     [Activity(Label = "Wyniki")]
     public class ResultsActivity : BaseActivity<ResultsViewModel>
     {
-        protected override int ActivityLayoutId => Resource.Layout.fragment_results;
+        protected override int ActivityLayoutId => Resource.Layout.activity_results;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -42,5 +43,9 @@ namespace InzProjTest.Droid.Views.Results
             return base.OnOptionsItemSelected(item);
         }
 
+        public override void OnConfigurationChanged(Configuration newConfig)
+        {
+            base.OnConfigurationChanged(newConfig);
+        }
     }
 }

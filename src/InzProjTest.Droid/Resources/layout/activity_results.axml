@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include
+        android:id="@+id/layout_toolbar"
+        layout="@layout/layout_toolbar" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        
+        <androidx.constraintlayout.widget.Guideline
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/guidelineResults"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.45"/>
+        <oxyplot.xamarin.android.PlotView
+            android:id="@+id/plot"
+            android:layout_width="match_parent"
+            android:layout_height="255dp"
+            app:MvxBind = "Model PlotModel"
+            android:layout_weight="1"
+            app:layout_constraintBottom_toTopOf="@+id/guidelineResults"/>
+        <!--<androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/main_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true">
+
+            <include
+                android:id="@+id/layout_toolbar"
+                layout="@layout/layout_toolbar" />
+
+            <FrameLayout
+                android:id="@+id/content_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true" />
+            <oxyplot.xamarin.android.PlotView
+                android:id="@+id/plot"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                android:layout_gravity="center"
+                app:MvxBind = "Model PlotModel"
+                android:layout_weight="1"/>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>-->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
