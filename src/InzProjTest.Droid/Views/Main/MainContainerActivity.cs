@@ -24,7 +24,7 @@ using AndroidX.Core.Content;
 namespace InzProjTest.Droid.Views.Main
 {
     [Activity(
-        Theme = "@style/AppTheme",
+        Theme = "@style/AppTheme", ScreenOrientation = ScreenOrientation.Portrait,
         WindowSoftInputMode = SoftInput.AdjustResize | SoftInput.StateHidden)]
     public class MainContainerActivity : BaseActivity<MainContainerViewModel>, IDrawerActivity
     {

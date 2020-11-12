@@ -64,7 +64,6 @@ namespace InzProjTest.Core.ViewModels.Results
                     magnitude[i] = (float)(20 * Math.Log10(magnitude[i]/maxMag));
                 }
                 var freq = Fourier.FrequencyScale(FftData.Length, 4000); //todo przenoszenie sampleRate, ogarniecie skali na x (screenshot YT)
-                var hzPerSample = 4000 / FftData.Length; // SampleRate/SamplesNumber  
                 var model = new PlotModel
                 {
                     PlotAreaBorderColor = OxyColors.Black,
@@ -93,7 +92,7 @@ namespace InzProjTest.Core.ViewModels.Results
                     TicklineColor = OxyColors.Black,
                     IsZoomEnabled = true,
                     IsPanEnabled = true,
-                    //Maximum = 0,
+                    Minimum = -80
                 });
                 var series1 = new LineSeries
                 {

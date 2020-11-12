@@ -5,6 +5,7 @@ using System.Text;
 using Acr.UserDialogs;
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.Content.Res;
 using Android.OS;
 using Android.Runtime;
@@ -19,7 +20,7 @@ using MvvmCross.Platforms.Android.Views;
 namespace InzProjTest.Droid.Views.Results
 {
     [MvxActivityPresentation]
-    [Activity(Label = "Wyniki")]
+    [Activity(Label = "Wyniki", ScreenOrientation = ScreenOrientation.Portrait)]
     public class ResultsActivity : BaseActivity<ResultsViewModel>
     {
         protected override int ActivityLayoutId => Resource.Layout.activity_results;
