@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using InzProjTest.Core.Interfaces;
+using InzProjTest.Core.Models;
 using InzProjTest.Core.ViewModels.Results;
 using MvvmCross;
 using MvvmCross.Commands;
@@ -55,6 +56,16 @@ namespace InzProjTest.Core.ViewModels.Main
                 RaisePropertyChanged(() => FileName);
             }
         }
+        private DateTime _creationDate;
+        public DateTime CreationDate
+        {
+            get => _creationDate;
+            set
+            {
+                _creationDate = value;
+                RaisePropertyChanged(() => CreationDate);
+            }
+        }
         #endregion
         public MainViewModel(IMvxNavigationService navigationService)
         {
@@ -93,6 +104,8 @@ namespace InzProjTest.Core.ViewModels.Main
             }
             FilePath = file.FilePath;
             FileName = file.FileName;
+            FileInfo fi = new FileInfo(FilePath);
+            CreationDate = fi.CreationTime;
         }
         private async Task AnalyzeSignalAsync()
         {
@@ -134,8 +147,16 @@ namespace InzProjTest.Core.ViewModels.Main
                 var magnitudes = framedFft.Select(x => x.Select(v => v.Magnitude).ToArray()).ToList();
                 averagedSignal = AverageSignal(magnitudes);
             });
+            Signal mySignal = new Signal
+            {
+                Filename = FileName,
+                Filepath = FilePath,
+                Data = averagedSignal,
+                SampleRate = isp.WaveFormat.SampleRate,
+                CreationDate = this.CreationDate
+            };
             Mvx.IoCProvider.Resolve<IUserDialogs>().HideLoading();
-            await _navigationService.Navigate<ResultsViewModel, float[]>(averagedSignal);
+            await _navigationService.Navigate<ResultsViewModel, Signal>(mySignal);
         }
 
         private List<Complex32[]> FrameSignal(Complex32[] fftInput, int framesCount)
@@ -147,7 +168,7 @@ namespace InzProjTest.Core.ViewModels.Main
              return framedFft;
         }
 
-        private float[] AverageSignal(List<float[]> framedSignal) //TODO sprawdzic czy dziala poprawnie
+        private float[] AverageSignal(List<float[]> framedSignal)
         {
             float[] result = new float[framedSignal[0].Length];
             float[] tmp = new float[framedSignal[0].Length];

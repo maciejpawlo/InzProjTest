@@ -9,7 +9,7 @@
             android:title="@string/app_home" />
         <item
             android:id="@+id/nav_settings"
-            android:title="@string/app_settings" />
+            android:title="@string/app_history" />
     </group>
 
 </menu>
