@@ -30,9 +30,7 @@ namespace InzProjTest.Core.ViewModels.Results
         #region Properties
 
         public Signal FftData { get; set; }
-         //public Complex32[] FftData { get; set; }
-        //public PlotModel PlotModel => GeneratePlotModel();
-        PlotModel _myModel;
+        private PlotModel _myModel;
         public PlotModel PlotModel
         {
             get => _myModel;
@@ -42,8 +40,60 @@ namespace InzProjTest.Core.ViewModels.Results
                 RaisePropertyChanged(() => PlotModel);
             }
         }
-        #endregion
 
+        private double _firstHarm;
+        public double FirstHarm
+        {
+            get => _firstHarm;
+            set
+            {
+                _firstHarm = value;
+                RaisePropertyChanged(() => FirstHarm);
+            }
+        }
+
+        private double _thirdHarm;
+        public double ThirdHarm
+        {
+            get => _thirdHarm;
+            set
+            {
+                _thirdHarm = value;
+                RaisePropertyChanged(() => ThirdHarm);
+            }
+        }
+        private double _forthHarm;
+        public double ForthHarm
+        {
+            get => _forthHarm;
+            set
+            {
+                _forthHarm = value;
+                RaisePropertyChanged(() => ForthHarm);
+            }
+        }
+        private double _thirdToForthRatio;
+        public double ThirdToForthRatio
+        {
+            get => _thirdToForthRatio;
+            set
+            {
+                _thirdToForthRatio = value;
+                RaisePropertyChanged(() => ThirdToForthRatio);
+            }
+        }
+        private double _rpmValue;
+        public double RpmValue
+        {
+            get => _rpmValue;
+            set
+            {
+                _rpmValue = value;
+                RaisePropertyChanged(() => RpmValue);
+            }
+        }
+        #endregion
+        
         public ResultsViewModel(IMvxNavigationService navigationService, ISignalAnalyzer signalAnalyzer)
         {
             _navigationService = navigationService;
@@ -61,24 +111,23 @@ namespace InzProjTest.Core.ViewModels.Results
         {
             await Task.Run((() =>
             {
-                //float[] magnitude = FftData.Select(x => x.Magnitude).ToArray();
-                var magnitude = FftData.Data;
-                float[] tempMagnitude = new float[magnitude.Length]; //TYLKO DO TESTÓW
-                Array.Copy(FftData.Data, tempMagnitude, tempMagnitude.Length);
-                var maxMag = magnitude.Max();
-                for (int i = 0; i < magnitude.Length; i++) //zamiana magnitude --> decibel
-                {
-                    magnitude[i] = (float)(20 * Math.Log10(magnitude[i]/maxMag));
-                }
-                var test = _signalAnalyzer.ToDecibelScale(tempMagnitude); //TYLKO DO TESTÓW
-                var freq = Fourier.FrequencyScale(FftData.Data.Length, FftData.SampleRate); //todo przenoszenie sampleRate, ogarniecie skali na x (screenshot YT)
-                //WYCIAGANIE WEKTORA DODATNICH CZESTOTLIWOSCI I ODPOWIADAJACYCH AMPLITUD SYGNALU
-                var positiveFreq = freq.Where(x => x >= 0).ToArray(); //dodatni wektor czestotliwosc
-                var firstNegativeFreq = freq.FirstOrDefault(i => i < 0);
-                var firstNegativeFreqIndex = Array.IndexOf(freq, firstNegativeFreq);
-                var positiveFreqMagnitude = magnitude.Take(firstNegativeFreqIndex).ToArray();
+                var magnitude = new float[FftData.Data.Length];
+                Array.Copy(FftData.Data, magnitude, magnitude.Length);
+                magnitude = _signalAnalyzer.ToDecibelScale(magnitude);
+                var freq = Fourier.FrequencyScale(FftData.Data.Length, FftData.SampleRate);
 
-                var harmonicIndices = _signalAnalyzer.GetHarmonics(positiveFreq, positiveFreqMagnitude);
+                var positiveFreqTest = _signalAnalyzer.GetPositiveFrequencyScale(freq);
+                var positiveMagTest = _signalAnalyzer.GetPositiveFreqMagnitudes(magnitude, freq);
+                var harmonicIndices = _signalAnalyzer.GetHarmonics(positiveFreqTest, positiveMagTest);
+
+                var harmfreq1 = positiveFreqTest[harmonicIndices[0]];
+                var harmfreq3 = positiveFreqTest[harmonicIndices[1]];
+                var harmfreq4 = positiveFreqTest[harmonicIndices[2]];
+
+                RpmValue = harmfreq1 * 60;
+                FirstHarm = Math.Round(harmfreq1, 0);
+                ThirdHarm = Math.Round(harmfreq3, 0);
+                ForthHarm = Math.Round(harmfreq4, 0);
 
                 var model = new PlotModel
                 {
@@ -86,6 +135,7 @@ namespace InzProjTest.Core.ViewModels.Results
                     LegendTextColor = OxyColors.Black,
                     LegendTitleColor = OxyColors.Black,
                     TextColor = OxyColors.Black,
+                    Background = OxyColors.White,
                 };
                 model.Axes.Add(new LinearAxis
                 {
@@ -128,12 +178,12 @@ namespace InzProjTest.Core.ViewModels.Results
 
                 for (int i = 0; i < harmonicIndices.Length; i++)
                 {
-                    seriesHarmonics.Points.Add(new DataPoint(positiveFreq[harmonicIndices[i]],
-                        positiveFreqMagnitude[harmonicIndices[i]]));
+                    seriesHarmonics.Points.Add(new DataPoint(positiveFreqTest[harmonicIndices[i]],
+                        positiveMagTest[harmonicIndices[i]]));
                 }
-                for (int i = 0; i < positiveFreqMagnitude.Length; i++)
+                for (int i = 0; i < positiveFreqTest.Length; i++)
                 {
-                    series1.Points.Add(new DataPoint(positiveFreq[i], positiveFreqMagnitude[i]));
+                    series1.Points.Add(new DataPoint(positiveFreqTest[i], positiveMagTest[i]));
                 }
 
                 model.Series.Add(series1);

@@ -29,6 +29,7 @@ namespace InzProjTest.Core.ViewModels.Main
     public class MainViewModel : BaseViewModel
     {
         private readonly IMvxNavigationService _navigationService;
+        private readonly ISignalAnalyzer _signalAnalyzer;
         #region Commands
         public IMvxAsyncCommand RecordSoundAsyncCommand { get; set; }
         public IMvxAsyncCommand OpenFilesExplorerCommand { get; set; }
@@ -67,9 +68,10 @@ namespace InzProjTest.Core.ViewModels.Main
             }
         }
         #endregion
-        public MainViewModel(IMvxNavigationService navigationService)
+        public MainViewModel(IMvxNavigationService navigationService, ISignalAnalyzer signalAnalyzer)
         {
             _navigationService = navigationService;
+            _signalAnalyzer = signalAnalyzer;
             RecordSoundAsyncCommand = new MvxAsyncCommand(RecordSoundAsync);
             OpenFilesExplorerCommand = new MvxAsyncCommand(OpenFilePickerAsync);
             AnalyzeSignalCommand = new MvxAsyncCommand(AnalyzeSignalAsync);
@@ -136,7 +138,7 @@ namespace InzProjTest.Core.ViewModels.Main
                 fftInput[i] = new Complex32(buffer[i], 0);
             }
             Mvx.IoCProvider.Resolve<IUserDialogs>().ShowLoading("Trwa analiza syngału...");
-            var framedFft = FrameSignal(fftInput, 10);
+            var framedFft = _signalAnalyzer.FrameSignal(fftInput, 10);
             float[] averagedSignal = new float[framedFft[0].Length];
             await Task.Run(() =>
             {
@@ -145,7 +147,7 @@ namespace InzProjTest.Core.ViewModels.Main
                     Fourier.Forward(signal, FourierOptions.Matlab);
                 }
                 var magnitudes = framedFft.Select(x => x.Select(v => v.Magnitude).ToArray()).ToList();
-                averagedSignal = AverageSignal(magnitudes);
+                averagedSignal = _signalAnalyzer.AverageSignal(magnitudes);
             });
             Signal mySignal = new Signal
             {
@@ -157,25 +159,6 @@ namespace InzProjTest.Core.ViewModels.Main
             };
             Mvx.IoCProvider.Resolve<IUserDialogs>().HideLoading();
             await _navigationService.Navigate<ResultsViewModel, Signal>(mySignal);
-        }
-
-        private List<Complex32[]> FrameSignal(Complex32[] fftInput, int framesCount)
-        {
-             var framedFft = fftInput.Select((x, i) => new {Index = i, Value = x})
-                .GroupBy(x => x.Index / (fftInput.Length / framesCount))
-                .Select(x => x.Select(v => v.Value).ToArray())
-                .ToList();
-             return framedFft;
-        }
-
-        private float[] AverageSignal(List<float[]> framedSignal)
-        {
-            float[] result = new float[framedSignal[0].Length];
-            float[] tmp = new float[framedSignal[0].Length];
-            var testRes = Enumerable.Range(0, framedSignal[0].Length).Select(i => framedSignal.Sum(p => p[i]))
-                .ToArray();
-            result = testRes.Select(x => x / framedSignal.Count).ToArray();
-            return result;
         }
     }
 }

@@ -9,49 +9,196 @@
     <include
         android:id="@+id/layout_toolbar"
         layout="@layout/layout_toolbar" />
-    <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+  
+    <androidx.cardview.widget.CardView
+        android:layout_marginTop="66dp"
+        android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="20dp"
+        android:foregroundGravity="center"
+        app:layout_anchorGravity="center_vertical"
+        android:elevation="2dp"
+        app:cardUseCompatPadding="true">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
         
-        <androidx.constraintlayout.widget.Guideline
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/guidelineResults"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.45"/>
-        <oxyplot.xamarin.android.PlotView
-            android:id="@+id/plot"
-            android:layout_width="match_parent"
-            android:layout_height="255dp"
-            app:MvxBind = "Model PlotModel"
-            android:layout_weight="1"
-            app:layout_constraintBottom_toTopOf="@+id/guidelineResults"/>
-        <!--<androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/main_frame"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true">
-
-            <include
-                android:id="@+id/layout_toolbar"
-                layout="@layout/layout_toolbar" />
-
-            <FrameLayout
-                android:id="@+id/content_frame"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_centerInParent="true" />
+            <androidx.constraintlayout.widget.Guideline
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/guidelineResults"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.5"/>
             <oxyplot.xamarin.android.PlotView
                 android:id="@+id/plot"
                 android:layout_width="match_parent"
-                android:layout_height="500dp"
-                android:layout_gravity="center"
+                android:layout_height="0dp"
                 app:MvxBind = "Model PlotModel"
-                android:layout_weight="1"/>
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>-->
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                app:layout_constraintHeight_percent="0.5"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                app:layout_constraintBottom_toTopOf="@+id/guidelineResults"/>
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintWidth_percent="0.5"
+                android:text="Prędkość obrotowa"
+                android:textSize="17sp"
+                android:gravity="center"
+                android:textAlignment="center"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/guidelineResults"
+                android:layout_marginTop="20dp"/>
+            <TextView
+                android:id="@+id/textViewRPMValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="2500 RPM"
+                app:MvxBind = "Text RpmValue, Converter=DoubleRpmToString"
+                android:textSize="17sp"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/guidelineResults"
+                android:layout_marginTop="20dp"/>
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintWidth_percent="0.5"
+                android:text="Stosunek III/IV"
+                android:textSize="17sp"
+                android:gravity="center"
+                android:textAlignment="center"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView1"
+                android:layout_marginTop="20dp"/>
+            <TextView
+                android:id="@+id/textViewRatioValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="0.2"
+                android:textSize="17sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:textColor="@android:color/black"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView1"
+                android:layout_marginTop="20dp"/>
+            <TextView
+                android:id="@+id/textViewFirstHarm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="I Harmoniczna"
+                android:textSize="17sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2"
+                android:layout_marginTop="20dp"
+                />
+            <TextView
+                android:id="@+id/textViewFirstHarmValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="30 Hz"
+                app:MvxBind = "Text FirstHarm, Converter=DoubleFrequencyToString"
+                android:textSize="17sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:textColor="@android:color/black"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textView2"
+                android:layout_marginTop="20dp"
+                />
+            <TextView
+                android:id="@+id/textViewThirdHarm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="III Harmoniczna"
+                android:textSize="17sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewFirstHarm"
+                android:layout_marginTop="20dp"/>
+            <TextView
+                android:id="@+id/textViewThirdtHarmValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="130 Hz"
+                app:MvxBind = "Text ThirdHarm, Converter=DoubleFrequencyToString"
+                android:textSize="17sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:textColor="@android:color/black"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewFirstHarm"
+                android:layout_marginTop="20dp"
+                />
+            <TextView
+                android:id="@+id/textViewForthHarm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="IV Harmoniczna"
+                android:textSize="17sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewThirdHarm"
+                android:layout_marginTop="20dp"/>
+            <TextView
+                android:id="@+id/textViewForthHarmValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="190 Hz"
+                app:MvxBind = "Text ForthHarm, Converter=DoubleFrequencyToString"
+                android:textSize="17sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:textColor="@android:color/black"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewThirdHarm"
+                android:layout_marginTop="20dp"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <!--<RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools">
+                <oxyplot.xamarin.android.PlotView
+                    android:id="@+id/plot"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:MvxBind = "Model PlotModel"
+                    
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    app:layout_constraintBottom_toTopOf="@+id/guidelineResults"/>
+            </LinearLayout>
+        </RelativeLayout>-->
+    </androidx.cardview.widget.CardView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

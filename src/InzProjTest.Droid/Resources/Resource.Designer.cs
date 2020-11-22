@@ -13162,14 +13162,14 @@ namespace InzProjTest.Droid
 			// aapt resource value: 0x7F0800F5
 			public const int text2 = 2131230965;
 			
-			// aapt resource value: 0x7F0800FB
-			public const int textinput_counter = 2131230971;
+			// aapt resource value: 0x7F080105
+			public const int textinput_counter = 2131230981;
 			
-			// aapt resource value: 0x7F0800FC
-			public const int textinput_error = 2131230972;
+			// aapt resource value: 0x7F080106
+			public const int textinput_error = 2131230982;
 			
-			// aapt resource value: 0x7F0800FD
-			public const int textinput_helper_text = 2131230973;
+			// aapt resource value: 0x7F080107
+			public const int textinput_helper_text = 2131230983;
 			
 			// aapt resource value: 0x7F0800F6
 			public const int textSpacerNoButtons = 2131230966;
@@ -13181,94 +13181,124 @@ namespace InzProjTest.Droid
 			public const int textStart = 2131230968;
 			
 			// aapt resource value: 0x7F0800F9
-			public const int textViewStatus = 2131230969;
-			
-			// aapt resource value: 0x7F0800FE
-			public const int textview_toolbar_title = 2131230974;
+			public const int textView1 = 2131230969;
 			
 			// aapt resource value: 0x7F0800FA
-			public const int text_input_password_toggle = 2131230970;
+			public const int textView2 = 2131230970;
 			
-			// aapt resource value: 0x7F0800FF
-			public const int time = 2131230975;
+			// aapt resource value: 0x7F0800FB
+			public const int textViewFirstHarm = 2131230971;
+			
+			// aapt resource value: 0x7F0800FC
+			public const int textViewFirstHarmValue = 2131230972;
+			
+			// aapt resource value: 0x7F0800FD
+			public const int textViewForthHarm = 2131230973;
+			
+			// aapt resource value: 0x7F0800FE
+			public const int textViewForthHarmValue = 2131230974;
 			
 			// aapt resource value: 0x7F080100
-			public const int title = 2131230976;
+			public const int textViewRatioValue = 2131230976;
+			
+			// aapt resource value: 0x7F0800FF
+			public const int textViewRPMValue = 2131230975;
 			
 			// aapt resource value: 0x7F080101
-			public const int titleDividerNoCustom = 2131230977;
+			public const int textViewStatus = 2131230977;
 			
 			// aapt resource value: 0x7F080102
-			public const int title_template = 2131230978;
+			public const int textViewThirdHarm = 2131230978;
 			
 			// aapt resource value: 0x7F080103
-			public const int toolbar = 2131230979;
-			
-			// aapt resource value: 0x7F080104
-			public const int top = 2131230980;
-			
-			// aapt resource value: 0x7F080105
-			public const int topPanel = 2131230981;
-			
-			// aapt resource value: 0x7F080106
-			public const int touch_outside = 2131230982;
-			
-			// aapt resource value: 0x7F080107
-			public const int transition_current_scene = 2131230983;
+			public const int textViewThirdtHarmValue = 2131230979;
 			
 			// aapt resource value: 0x7F080108
-			public const int transition_layout_save = 2131230984;
+			public const int textview_toolbar_title = 2131230984;
+			
+			// aapt resource value: 0x7F080104
+			public const int text_input_password_toggle = 2131230980;
 			
 			// aapt resource value: 0x7F080109
-			public const int transition_position = 2131230985;
+			public const int time = 2131230985;
 			
 			// aapt resource value: 0x7F08010A
-			public const int transition_scene_layoutid_cache = 2131230986;
+			public const int title = 2131230986;
 			
 			// aapt resource value: 0x7F08010B
-			public const int transition_transform = 2131230987;
+			public const int titleDividerNoCustom = 2131230987;
 			
 			// aapt resource value: 0x7F08010C
-			public const int txt_ChoosenFile = 2131230988;
+			public const int title_template = 2131230988;
 			
 			// aapt resource value: 0x7F08010D
-			public const int txt_FilePath = 2131230989;
+			public const int toolbar = 2131230989;
 			
 			// aapt resource value: 0x7F08010E
-			public const int txt_welcome = 2131230990;
+			public const int top = 2131230990;
 			
 			// aapt resource value: 0x7F08010F
-			public const int @unchecked = 2131230991;
+			public const int topPanel = 2131230991;
 			
 			// aapt resource value: 0x7F080110
-			public const int uniform = 2131230992;
+			public const int touch_outside = 2131230992;
 			
 			// aapt resource value: 0x7F080111
-			public const int unlabeled = 2131230993;
+			public const int transition_current_scene = 2131230993;
 			
 			// aapt resource value: 0x7F080112
-			public const int up = 2131230994;
+			public const int transition_layout_save = 2131230994;
 			
 			// aapt resource value: 0x7F080113
-			public const int useLogo = 2131230995;
+			public const int transition_position = 2131230995;
 			
 			// aapt resource value: 0x7F080114
-			public const int view_offset_helper = 2131230996;
+			public const int transition_scene_layoutid_cache = 2131230996;
 			
 			// aapt resource value: 0x7F080115
-			public const int visible = 2131230997;
+			public const int transition_transform = 2131230997;
 			
 			// aapt resource value: 0x7F080116
-			public const int visible_removing_fragment_view_tag = 2131230998;
+			public const int txt_ChoosenFile = 2131230998;
 			
 			// aapt resource value: 0x7F080117
-			public const int withText = 2131230999;
+			public const int txt_FilePath = 2131230999;
 			
 			// aapt resource value: 0x7F080118
-			public const int wrap = 2131231000;
+			public const int txt_welcome = 2131231000;
 			
 			// aapt resource value: 0x7F080119
-			public const int wrap_content = 2131231001;
+			public const int @unchecked = 2131231001;
+			
+			// aapt resource value: 0x7F08011A
+			public const int uniform = 2131231002;
+			
+			// aapt resource value: 0x7F08011B
+			public const int unlabeled = 2131231003;
+			
+			// aapt resource value: 0x7F08011C
+			public const int up = 2131231004;
+			
+			// aapt resource value: 0x7F08011D
+			public const int useLogo = 2131231005;
+			
+			// aapt resource value: 0x7F08011E
+			public const int view_offset_helper = 2131231006;
+			
+			// aapt resource value: 0x7F08011F
+			public const int visible = 2131231007;
+			
+			// aapt resource value: 0x7F080120
+			public const int visible_removing_fragment_view_tag = 2131231008;
+			
+			// aapt resource value: 0x7F080121
+			public const int withText = 2131231009;
+			
+			// aapt resource value: 0x7F080122
+			public const int wrap = 2131231010;
+			
+			// aapt resource value: 0x7F080123
+			public const int wrap_content = 2131231011;
 			
 			static Id()
 			{
