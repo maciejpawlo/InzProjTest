@@ -84,7 +84,7 @@ namespace InzProjTest.Core.ViewModels.Main
             var recorder = new AudioRecorderService()
             {
                 StopRecordingOnSilence = false,
-                TotalAudioTimeout = TimeSpan.FromSeconds(11),
+                TotalAudioTimeout = TimeSpan.FromSeconds(30),
                 StopRecordingAfterTimeout =  true,
                 FilePath = Mvx.IoCProvider.Resolve<ILocalFileHelper>().GetPath(filename),
                 PreferredSampleRate = 4000,
@@ -132,6 +132,7 @@ namespace InzProjTest.Core.ViewModels.Main
                     break;
             }
             isp.Read(buffer, 0, buffer.Length);
+            Array.Resize(ref buffer, 120000);//dociąganie wav do odpowiedniej długości (wypełnianie zerami)
             Complex32[] fftInput = new Complex32[buffer.Length]; //testowo wersja bez okna
             for (int i = 0; i < fftInput.Length; i++)
             {

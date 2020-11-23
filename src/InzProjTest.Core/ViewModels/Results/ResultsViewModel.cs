@@ -124,10 +124,10 @@ namespace InzProjTest.Core.ViewModels.Results
                 var harmfreq3 = positiveFreqTest[harmonicIndices[1]];
                 var harmfreq4 = positiveFreqTest[harmonicIndices[2]];
 
-                RpmValue = harmfreq1 * 60;
-                FirstHarm = Math.Round(harmfreq1, 0);
-                ThirdHarm = Math.Round(harmfreq3, 0);
-                ForthHarm = Math.Round(harmfreq4, 0);
+                RpmValue = Math.Round(harmfreq1 * 60, 0);
+                FirstHarm = Math.Round(harmfreq1, 1);
+                ThirdHarm = Math.Round(harmfreq3, 1);
+                ForthHarm = Math.Round(harmfreq4, 1);
 
                 var model = new PlotModel
                 {
