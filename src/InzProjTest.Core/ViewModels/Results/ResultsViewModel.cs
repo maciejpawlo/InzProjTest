@@ -92,12 +92,27 @@ namespace InzProjTest.Core.ViewModels.Results
                 RaisePropertyChanged(() => RpmValue);
             }
         }
+
+        private bool _isPlotZoomed;
+        public bool IsPlotZoomed
+        {
+            get => _isPlotZoomed;
+            set
+            {
+                _isPlotZoomed = value;
+                RaisePropertyChanged(() => IsPlotZoomed);
+            }
+        }
         #endregion
-        
+
+        #region Commands
+        public MvxCommand ZoomPlotCommand { get; set; }
+        #endregion
         public ResultsViewModel(IMvxNavigationService navigationService, ISignalAnalyzer signalAnalyzer)
         {
             _navigationService = navigationService;
             _signalAnalyzer = signalAnalyzer;
+            ZoomPlotCommand = new MvxCommand(ZoomPlot);
         }
 
         public override async Task Initialize()
@@ -123,6 +138,19 @@ namespace InzProjTest.Core.ViewModels.Results
                 var harmfreq1 = positiveFreqTest[harmonicIndices[0]];
                 var harmfreq3 = positiveFreqTest[harmonicIndices[1]];
                 var harmfreq4 = positiveFreqTest[harmonicIndices[2]];
+
+                double[] positiveMagDoubles = new double[positiveMagTest.Length];
+                for (int i = 0; i < positiveMagDoubles.Length; i++)
+                {
+                    positiveMagDoubles[i] = (double)positiveMagTest[i];
+                }
+                //obliczanie amplitudy III i IV harmonicznej
+                var forthHarmAmplitude =
+                    _signalAnalyzer.MeasureHarmonicAmplitude(positiveFreqTest, positiveMagTest, harmonicIndices[2]);
+                var thirdHarmAmplitude =
+                    _signalAnalyzer.MeasureHarmonicAmplitude(positiveFreqTest, positiveMagTest, harmonicIndices[1]);
+
+                ThirdToForthRatio = Math.Round((thirdHarmAmplitude / forthHarmAmplitude), 2);
 
                 RpmValue = Math.Round(harmfreq1 * 60, 0);
                 FirstHarm = Math.Round(harmfreq1, 1);
@@ -154,7 +182,8 @@ namespace InzProjTest.Core.ViewModels.Results
                     AxislineColor = OxyColors.Black,
                     Title = "Amplituda [dB]",
                     TicklineColor = OxyColors.Black,
-                    //Minimum = -70,
+                    Maximum = 0,
+                    Minimum = -70,
                     IntervalLength = 50,
                 });
                 var series1 = new LineSeries
@@ -168,6 +197,11 @@ namespace InzProjTest.Core.ViewModels.Results
                     MarkerSize = 3,
                     MarkerType = MarkerType.Circle,
                     StrokeThickness = 0
+                };
+                var seriesFit = new LineSeries
+                {
+                    Color = OxyColors.Green,
+                    StrokeThickness = 0.5
                 };
                 #region rysowanie pełnego widma fft
                 //for (int i = 0; i < magnitude.Length; i++)
@@ -184,14 +218,29 @@ namespace InzProjTest.Core.ViewModels.Results
                 for (int i = 0; i < positiveFreqTest.Length; i++)
                 {
                     series1.Points.Add(new DataPoint(positiveFreqTest[i], positiveMagTest[i]));
+                   // seriesFit.Points.Add(new DataPoint(positiveFreqTest[i], forthHarmLineTEST[i]));
                 }
 
                 model.Series.Add(series1);
                 model.Series.Add(seriesHarmonics);
+               // model.Series.Add(seriesFit);
                 PlotModel = model;
             }));
         }
 
+        private void ZoomPlot()
+        {
+            if (IsPlotZoomed)
+            {
+                IsPlotZoomed = false;
+                PlotModel.Axes[0].Zoom(0,300);
+                PlotModel.InvalidatePlot(true);
+                return;
+            }
+            IsPlotZoomed = true;
+            PlotModel.Axes[0].Zoom(100,230);
+            PlotModel.InvalidatePlot(true);
+        }
         public override void Prepare(Signal parameter) => FftData = parameter;
     }
 }
