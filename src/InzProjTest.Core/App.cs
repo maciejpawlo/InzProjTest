@@ -17,6 +17,7 @@ namespace InzProjTest.Core
                 .RegisterAsLazySingleton();
             MvvmCross.Mvx.IoCProvider.RegisterSingleton<IUserDialogs>(()=>UserDialogs.Instance);
             MvvmCross.Mvx.IoCProvider.RegisterType<ISignalAnalyzer, SignalAnalyzer>();
+            MvvmCross.Mvx.IoCProvider.RegisterType<IWavReaderService, WavReaderService>();
             RegisterAppStart<MainViewModel>();
         }
     }

@@ -30,6 +30,7 @@ namespace InzProjTest.Core.ViewModels.Main
     {
         private readonly IMvxNavigationService _navigationService;
         private readonly ISignalAnalyzer _signalAnalyzer;
+        private readonly IWavReaderService _wavReader;
         #region Commands
         public IMvxAsyncCommand RecordSoundAsyncCommand { get; set; }
         public IMvxAsyncCommand OpenFilesExplorerCommand { get; set; }
@@ -68,10 +69,11 @@ namespace InzProjTest.Core.ViewModels.Main
             }
         }
         #endregion
-        public MainViewModel(IMvxNavigationService navigationService, ISignalAnalyzer signalAnalyzer)
+        public MainViewModel(IMvxNavigationService navigationService, ISignalAnalyzer signalAnalyzer, IWavReaderService wavReader)
         {
             _navigationService = navigationService;
             _signalAnalyzer = signalAnalyzer;
+            _wavReader = wavReader;
             RecordSoundAsyncCommand = new MvxAsyncCommand(RecordSoundAsync);
             OpenFilesExplorerCommand = new MvxAsyncCommand(OpenFilePickerAsync);
             AnalyzeSignalCommand = new MvxAsyncCommand(AnalyzeSignalAsync);
@@ -116,28 +118,7 @@ namespace InzProjTest.Core.ViewModels.Main
                 await Mvx.IoCProvider.Resolve<IUserDialogs>().AlertAsync("Nie wybrano żadnego pliku.", "Błąd odczytu pliku", "OK");
                 return;
             }
-            AudioFileReader reader = new AudioFileReader(FilePath); //odczyt wav
-            ISampleProvider isp = reader.ToSampleProvider();
-            float[] buffer;
-            switch (isp.WaveFormat.BitsPerSample) //wybor rozmiary bufora w zaleznosci od bitspersample
-            {
-                case 16:
-                    buffer = new float[reader.Length / 2];
-                    break;
-                case 32:
-                    buffer = new float[reader.Length / 4];
-                    break;
-                default:
-                    buffer = new float[reader.Length / 2];
-                    break;
-            }
-            isp.Read(buffer, 0, buffer.Length);
-            Array.Resize(ref buffer, 120000);//dociąganie wav do odpowiedniej długości (wypełnianie zerami)
-            Complex32[] fftInput = new Complex32[buffer.Length]; //testowo wersja bez okna
-            for (int i = 0; i < fftInput.Length; i++)
-            {
-                fftInput[i] = new Complex32(buffer[i], 0);
-            }
+            var fftInput = _wavReader.ReadWavFile(FilePath, out var sampleRate);
             Mvx.IoCProvider.Resolve<IUserDialogs>().ShowLoading("Trwa analiza syngału...");
             var framedFft = _signalAnalyzer.FrameSignal(fftInput, 10);
             float[] averagedSignal = new float[framedFft[0].Length];
@@ -154,7 +135,7 @@ namespace InzProjTest.Core.ViewModels.Main
                 Filename = FileName,
                 Filepath = FilePath,
                 Data = averagedSignal,
-                SampleRate = isp.WaveFormat.SampleRate,
+                SampleRate = sampleRate,
                 CreationDate = this.CreationDate
             };
             Mvx.IoCProvider.Resolve<IUserDialogs>().HideLoading();
