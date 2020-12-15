@@ -138,12 +138,6 @@ namespace InzProjTest.Core.ViewModels.Results
                 var harmfreq1 = positiveFreqTest[harmonicIndices[0]];
                 var harmfreq3 = positiveFreqTest[harmonicIndices[1]];
                 var harmfreq4 = positiveFreqTest[harmonicIndices[2]];
-
-                double[] positiveMagDoubles = new double[positiveMagTest.Length];
-                for (int i = 0; i < positiveMagDoubles.Length; i++)
-                {
-                    positiveMagDoubles[i] = (double)positiveMagTest[i];
-                }
                 //obliczanie amplitudy III i IV harmonicznej
                 var forthHarmAmplitude =
                     _signalAnalyzer.MeasureHarmonicAmplitude(positiveFreqTest, positiveMagTest, harmonicIndices[2]);
@@ -182,8 +176,7 @@ namespace InzProjTest.Core.ViewModels.Results
                     AxislineColor = OxyColors.Black,
                     Title = "Amplituda [dB]",
                     TicklineColor = OxyColors.Black,
-                    Maximum = 0,
-                    Minimum = -70,
+                    
                     IntervalLength = 50,
                 });
                 var series1 = new LineSeries
@@ -203,12 +196,6 @@ namespace InzProjTest.Core.ViewModels.Results
                     Color = OxyColors.Green,
                     StrokeThickness = 0.5
                 };
-                #region rysowanie pełnego widma fft
-                //for (int i = 0; i < magnitude.Length; i++)
-                //{
-                //    series1.Points.Add(new DataPoint(freq[i], magnitude[i]));
-                //}
-                #endregion
 
                 for (int i = 0; i < harmonicIndices.Length; i++)
                 {

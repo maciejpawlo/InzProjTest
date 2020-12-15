@@ -6,6 +6,7 @@
     <string name="app_home">Start</string>
     <string name="app_settings">Settings</string>
     <string name="app_history">Historia</string>
+    <string name="app_about">O aplikacji</string>
     <string name="app_template">MvxScaffolding</string>
 
     <string name="drawer_open">Open navigation drawer</string>

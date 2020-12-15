@@ -22,6 +22,7 @@ using MathNet;
 using MathNet.Numerics;
 using MathNet.Numerics.IntegralTransforms;
 using NAudio.Dsp;
+using Xamarin.Essentials;
 using Complex = System.Numerics.Complex;
 
 namespace InzProjTest.Core.ViewModels.Main
@@ -68,6 +69,46 @@ namespace InzProjTest.Core.ViewModels.Main
                 RaisePropertyChanged(() => CreationDate);
             }
         }
+        private bool _isRecSessionChecked;
+        public bool IsRecSessionChecked
+        {
+            get => _isRecSessionChecked;
+            set
+            {
+                _isRecSessionChecked = value;
+                RaisePropertyChanged(() => IsRecSessionChecked);
+            }
+        }
+
+        private int _recSessionCounter;
+
+        public int RecSessionCounter
+        {
+            get => _recSessionCounter;
+            set => SetProperty(ref _recSessionCounter, value);
+        }
+
+        private string _firstName;
+        public string FirstName
+        {
+            get => _firstName;
+            set
+            {
+                _firstName = value;
+                RaisePropertyChanged(() => FirstName);
+            }
+        }
+
+        private string _lastName;
+        public string LastName
+        {
+            get => _lastName;
+            set
+            {
+                _lastName = value;
+                RaisePropertyChanged(() => LastName);
+            }
+        }
         #endregion
         public MainViewModel(IMvxNavigationService navigationService, ISignalAnalyzer signalAnalyzer, IWavReaderService wavReader)
         {
@@ -81,14 +122,36 @@ namespace InzProjTest.Core.ViewModels.Main
 
         private async Task RecordSoundAsync()
         {
+            var permissionMic = await Permissions.CheckStatusAsync<Permissions.Microphone>();
+            if (permissionMic != PermissionStatus.Granted)
+            {
+                await Permissions.RequestAsync<Permissions.Microphone>();
+                return;
+            }
             DateTime todaysTime = DateTime.Now;
-            var filename = "rec_" + $"{todaysTime:yyyyMMdd}_{todaysTime.Hour}{todaysTime.Minute}{todaysTime.Second}" + ".wav";
+            string filename = "";
+            if (IsRecSessionChecked && !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName))
+            {
+                FirstName = FirstName.Trim();
+                LastName = LastName.Trim();
+                filename = $"{FirstName}_" + $"{LastName}_" + $"{todaysTime:yyyyMMdd}_{todaysTime.Hour}{todaysTime.Minute}{todaysTime.Second}" + ".wav";
+            }
+            else if (IsRecSessionChecked && (string.IsNullOrEmpty(FirstName) || string.IsNullOrEmpty(LastName)))
+            {
+                await Mvx.IoCProvider.Resolve<IUserDialogs>().AlertAsync("Pola tekstowe nie mogą być puste!", "Błąd", "Ok");
+                return;
+            }
+            else
+            {
+                filename = "rec_" + $"{todaysTime:yyyyMMdd}_{todaysTime.Hour}{todaysTime.Minute}{todaysTime.Second}" + ".wav";
+            }
             var recorder = new AudioRecorderService()
             {
                 StopRecordingOnSilence = false,
-                TotalAudioTimeout = TimeSpan.FromSeconds(11),
+                TotalAudioTimeout = TimeSpan.FromSeconds(30),
                 StopRecordingAfterTimeout =  true,
-                FilePath = Mvx.IoCProvider.Resolve<ILocalFileHelper>().GetPath(filename),
+                FilePath = IsRecSessionChecked ? Mvx.IoCProvider.Resolve<ILocalFileHelper>().GetPatientPath(filename, FirstName, LastName)
+                    : Mvx.IoCProvider.Resolve<ILocalFileHelper>().GetPath(filename),
                 PreferredSampleRate = 4000,
             };
             Mvx.IoCProvider.Resolve<IUserDialogs>().ShowLoading("Nagrywanie...");
@@ -101,7 +164,14 @@ namespace InzProjTest.Core.ViewModels.Main
 
         private async Task OpenFilePickerAsync()
         {
-            FileData file = await CrossFilePicker.Current.PickFile();
+            var device = DeviceInfo.Platform;
+            string[] fileTypes = null; //ograniczenie dostępnych rozszerzeń do .wav
+            if (device == DevicePlatform.Android)
+                fileTypes = new string[]{ "audio/x-wav" };
+            if (device == DevicePlatform.iOS)
+                fileTypes = new string[] { "public.wav" };
+
+            FileData file = await CrossFilePicker.Current.PickFile(fileTypes);
             if (file == null)
             {
                 return;
@@ -142,4 +212,5 @@ namespace InzProjTest.Core.ViewModels.Main
             await _navigationService.Navigate<ResultsViewModel, Signal>(mySignal);
         }
     }
+    
 }

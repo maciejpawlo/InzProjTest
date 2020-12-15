@@ -20,6 +20,7 @@ using InzProjTest.Droid.Views.Helpers;
 using Android.Content.PM;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
+using Google.Android.Material.TextField;
 
 namespace InzProjTest.Droid.Views.Main
 {
@@ -32,16 +33,14 @@ namespace InzProjTest.Droid.Views.Main
 
         public DrawerLayout DrawerLayout { get; private set; }
         protected MvxActionBarDrawerToggle DrawerToggle { get; private set; }
-
         protected override void OnCreate(Bundle bundle)
         {
             base.OnCreate(bundle);
 
             DrawerLayout = FindViewById<DrawerLayout>(Resource.Id.drawer_layout);
-
             SetupDrawerLayout();
             DrawerToggle.SyncState();
-
+            
             UserDialogs.Init(this); //acr dialgos init
             if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.RecordAudio) != Permission.Granted)
             {
@@ -109,7 +108,6 @@ namespace InzProjTest.Droid.Views.Main
             {
                 var inputMethodManager = (InputMethodManager)GetSystemService(InputMethodService);
                 inputMethodManager.HideSoftInputFromWindow(CurrentFocus.WindowToken, 0);
-
                 CurrentFocus.ClearFocus();
             }
         }

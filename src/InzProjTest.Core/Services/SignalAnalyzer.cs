@@ -10,7 +10,7 @@ namespace InzProjTest.Core.Services
 {
     public class SignalAnalyzer : ISignalAnalyzer
     {
-        float[] ISignalAnalyzer.AverageSignal(List<Complex32[]> framedSignal) //todo zmiania argumentu na List<Complex32>
+        float[] ISignalAnalyzer.AverageSignal(List<Complex32[]> framedSignal)
         {
             var magnitudes = framedSignal.Select(x => x.Select(v => v.Magnitude).ToArray()).ToList();
             float[] result = new float[framedSignal[0].Length];
@@ -108,7 +108,7 @@ namespace InzProjTest.Core.Services
             return frequencies.Where(x => x >= 0).ToArray();
         }
 
-        double ISignalAnalyzer.MeasureHarmonicAmplitude(double[] positiveFrequencies, float[] positiveMagnitudes, int index) //TODO poki co zwraca prosta pomiedzy dwoma pkt
+        double ISignalAnalyzer.MeasureHarmonicAmplitude(double[] positiveFrequencies, float[] positiveMagnitudes, int index)
         {
             var frequenciesRight = positiveFrequencies[(index + 40)..(index + 70)];
             var frequenciesLeft = positiveFrequencies[(index - 70)..(index - 40)];
