@@ -31,44 +31,6 @@ namespace InzProjTest.Core.Services
 
         int[] ISignalAnalyzer.GetHarmonics(double[] positiveFrequencies, float[] positiveMagnitudes) //TODO REFRACTOR
         {
-            #region WYSZUKIWANIE NA PODSTAWIE I HARMONICZNEJ
-            //var indexArray = new int[3];
-            ////zakres czestotliwosci pracy pompy
-            //var firstHarmStartFreq = 30;
-            //var firstHarmStopFreq = 59;
-            ////wyszukiwanie indeksow odpowiadajacych dwóm częstotliwościom
-            //var closestToFirstHarmStart = positiveFrequencies.Aggregate((x, y) =>
-            //    Math.Abs(x - firstHarmStartFreq) < Math.Abs(y - firstHarmStartFreq) ? x : y);
-            //var closestToFirstHarmStartIndex = Array.IndexOf(positiveFrequencies, closestToFirstHarmStart);
-
-            //var closestToFirstHarmStop = positiveFrequencies.Aggregate((x, y) =>
-            //    Math.Abs(x - firstHarmStopFreq) < Math.Abs(y - firstHarmStopFreq) ? x : y);
-            //var closestToFirstHarmStopIndex = Array.IndexOf(positiveFrequencies, closestToFirstHarmStop);
-            ////Maximum z zakresu czestotliwosci => I harmoniczna
-            //var firstHarmonicMagnitude = positiveMagnitudes.Skip(closestToFirstHarmStartIndex - 1)
-            //    .Take(closestToFirstHarmStopIndex - closestToFirstHarmStartIndex + 1).Max();
-            //var firstHarmonicIndex = Array.IndexOf(positiveMagnitudes, firstHarmonicMagnitude);
-            ////Wyszukiwanie III harmonicznej
-            //var thirdHarmFrequencyEstimated = positiveFrequencies[firstHarmonicIndex] * 3;
-
-            //var thirdHarmonicFreq = positiveFrequencies.Aggregate((x, y) =>
-            //    Math.Abs(x - thirdHarmFrequencyEstimated) < Math.Abs(y - thirdHarmFrequencyEstimated) ? x : y);
-            //var thirdHarmonicIndex = Array.IndexOf(positiveFrequencies, thirdHarmonicFreq);
-            ////Wyszukiwanie IV harmonicznej 
-            //var forthHarmFrequencyEstimated = positiveFrequencies[firstHarmonicIndex] * 4;
-
-            //var forthHarmonicFreq = positiveFrequencies.Aggregate((x, y) =>
-            //    Math.Abs(x - forthHarmFrequencyEstimated) < Math.Abs(y - forthHarmFrequencyEstimated) ? x : y);
-            //var forthHarmonicIndex = Array.IndexOf(positiveFrequencies, forthHarmonicFreq);
-
-            //indexArray[0] = firstHarmonicIndex;
-            //indexArray[1] = thirdHarmonicIndex;
-            //indexArray[2] = forthHarmonicIndex;
-
-            //return indexArray;
-
-            #endregion
-
             //WYSZUKIWANIE IV HARMONICZNEJ 
             var indexArray = new int[3];
             var forthHarmStartFreq = 120; //30Hz*4
@@ -84,8 +46,6 @@ namespace InzProjTest.Core.Services
             var forthHarmonicMagnitude = positiveMagnitudes.Skip(closestToForthHarmStartIndex - 1)
                 .Take(closestToForthHarmStopIndex - closestToForthHarmStartIndex + 1).Max();
             var forthHarmonicIndex = Array.IndexOf(positiveMagnitudes, forthHarmonicMagnitude);
-
-            //TODO WALIDACJA INDEXOW --> SPRAWDZIC JEDEN INDEX W LEWO I JEDEN W PRAWO
 
             var firstHarmonicIndex = forthHarmonicIndex / 4;
             var thirdHarmonicIndex = firstHarmonicIndex * 3;

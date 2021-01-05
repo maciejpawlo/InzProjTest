@@ -33,7 +33,7 @@ namespace InzProjTest.Core.ViewModels.Main
         private readonly ISignalAnalyzer _signalAnalyzer;
         private readonly IWavReaderService _wavReader;
         #region Commands
-        public IMvxAsyncCommand RecordSoundAsyncCommand { get; set; }
+        public IMvxAsyncCommand RecordSoundCommand { get; set; }
         public IMvxAsyncCommand OpenFilesExplorerCommand { get; set; }
         public IMvxAsyncCommand AnalyzeSignalCommand { get; set; }
         #endregion
@@ -59,16 +59,6 @@ namespace InzProjTest.Core.ViewModels.Main
                 RaisePropertyChanged(() => FileName);
             }
         }
-        private DateTime _creationDate;
-        public DateTime CreationDate
-        {
-            get => _creationDate;
-            set
-            {
-                _creationDate = value;
-                RaisePropertyChanged(() => CreationDate);
-            }
-        }
         private bool _isRecSessionChecked;
         public bool IsRecSessionChecked
         {
@@ -78,14 +68,6 @@ namespace InzProjTest.Core.ViewModels.Main
                 _isRecSessionChecked = value;
                 RaisePropertyChanged(() => IsRecSessionChecked);
             }
-        }
-
-        private int _recSessionCounter;
-
-        public int RecSessionCounter
-        {
-            get => _recSessionCounter;
-            set => SetProperty(ref _recSessionCounter, value);
         }
 
         private string _firstName;
@@ -115,7 +97,7 @@ namespace InzProjTest.Core.ViewModels.Main
             _navigationService = navigationService;
             _signalAnalyzer = signalAnalyzer;
             _wavReader = wavReader;
-            RecordSoundAsyncCommand = new MvxAsyncCommand(RecordSoundAsync);
+            RecordSoundCommand = new MvxAsyncCommand(RecordSoundAsync);
             OpenFilesExplorerCommand = new MvxAsyncCommand(OpenFilePickerAsync);
             AnalyzeSignalCommand = new MvxAsyncCommand(AnalyzeSignalAsync);
         }
@@ -178,8 +160,6 @@ namespace InzProjTest.Core.ViewModels.Main
             }
             FilePath = file.FilePath;
             FileName = file.FileName;
-            FileInfo fi = new FileInfo(FilePath);
-            CreationDate = fi.CreationTime;
         }
         private async Task AnalyzeSignalAsync()
         {
@@ -206,7 +186,6 @@ namespace InzProjTest.Core.ViewModels.Main
                 Filepath = FilePath,
                 Data = averagedSignal,
                 SampleRate = sampleRate,
-                CreationDate = this.CreationDate
             };
             Mvx.IoCProvider.Resolve<IUserDialogs>().HideLoading();
             await _navigationService.Navigate<ResultsViewModel, Signal>(mySignal);

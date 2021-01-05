@@ -5,7 +5,7 @@ namespace InzProjTest.Core.Interfaces
 {
     public interface ISignalAnalyzer
     {
-        List<Complex32[]> FrameSignal(Complex32[] fftInput, int framesCount); //ewentualnie zmienic na  List<float[]>??
+        List<Complex32[]> FrameSignal(Complex32[] fftInput, int framesCount);
         float[] AverageSignal(List<Complex32[]> framedSignal);
         double[] GetPositiveFrequencyScale(double[] frequencies);
         float[] GetPositiveFreqMagnitudes(float[] magnitudes, double[] frequencies);

@@ -4,16 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineAbout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5"/>
     <TextView
         android:id="@+id/txt_welcome"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:text="@string/app_settings"
+        android:text="@string/app_thesis"
         android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/guidelineAbout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    
+        android:textStyle="italic"
+        />
+    <TextView
+        android:id="@+id/txt_AppDev"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="Wykonał: Maciej Pawłowski"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/guidelineAbout"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

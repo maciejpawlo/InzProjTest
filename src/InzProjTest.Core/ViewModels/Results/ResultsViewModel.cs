@@ -122,7 +122,7 @@ namespace InzProjTest.Core.ViewModels.Results
             Mvx.IoCProvider.Resolve<IUserDialogs>().HideLoading();
         }
 
-        private async Task GeneratePlotModelAsync() //todo asynchroniczna zeby nie blokować UI thread
+        private async Task GeneratePlotModelAsync()
         {
             await Task.Run((() =>
             {
@@ -168,6 +168,9 @@ namespace InzProjTest.Core.ViewModels.Results
                     Title = "Częstotliwość [Hz]",
                     Minimum = 0,
                     Maximum = 300,
+                    ExtraGridlines = new double[] { harmfreq1, harmfreq3, harmfreq4 },
+                    ExtraGridlineStyle = LineStyle.Dot,
+                    ExtraGridlineColor = OxyColors.Gray,
                 });
                 model.Axes.Add(new LinearAxis
                 {
@@ -176,13 +179,14 @@ namespace InzProjTest.Core.ViewModels.Results
                     AxislineColor = OxyColors.Black,
                     Title = "Amplituda [dB]",
                     TicklineColor = OxyColors.Black,
-                    
+                    Minimum = -70,
+                    Maximum = 0,
                     IntervalLength = 50,
                 });
                 var series1 = new LineSeries
                 {
                     Color = OxyColors.Red,
-                    StrokeThickness = 0.5
+                    StrokeThickness = 0.5,               
                 };
                 var seriesHarmonics = new LineSeries
                 {
@@ -191,11 +195,11 @@ namespace InzProjTest.Core.ViewModels.Results
                     MarkerType = MarkerType.Circle,
                     StrokeThickness = 0
                 };
-                var seriesFit = new LineSeries
-                {
-                    Color = OxyColors.Green,
-                    StrokeThickness = 0.5
-                };
+                //var seriesFit = new LineSeries
+                //{
+                //    Color = OxyColors.Green,
+                //    StrokeThickness = 0.5
+                //};
 
                 for (int i = 0; i < harmonicIndices.Length; i++)
                 {
