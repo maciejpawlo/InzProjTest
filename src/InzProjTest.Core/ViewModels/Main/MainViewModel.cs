@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
-using InzProjTest.Core.Helpers;
 using InzProjTest.Core.Interfaces;
+using InzProjTest.Core.Models;
 using InzProjTest.Core.ViewModels.Results;
 using MvvmCross;
 using MvvmCross.Commands;
@@ -21,6 +22,7 @@ using MathNet;
 using MathNet.Numerics;
 using MathNet.Numerics.IntegralTransforms;
 using NAudio.Dsp;
+using Xamarin.Essentials;
 using Complex = System.Numerics.Complex;
 
 namespace InzProjTest.Core.ViewModels.Main
@@ -28,8 +30,10 @@ namespace InzProjTest.Core.ViewModels.Main
     public class MainViewModel : BaseViewModel
     {
         private readonly IMvxNavigationService _navigationService;
+        private readonly ISignalAnalyzer _signalAnalyzer;
+        private readonly IWavReaderService _wavReader;
         #region Commands
-        public IMvxAsyncCommand RecordSoundAsyncCommand { get; set; }
+        public IMvxAsyncCommand RecordSoundCommand { get; set; }
         public IMvxAsyncCommand OpenFilesExplorerCommand { get; set; }
         public IMvxAsyncCommand AnalyzeSignalCommand { get; set; }
         #endregion
@@ -55,26 +59,82 @@ namespace InzProjTest.Core.ViewModels.Main
                 RaisePropertyChanged(() => FileName);
             }
         }
+        private bool _isRecSessionChecked;
+        public bool IsRecSessionChecked
+        {
+            get => _isRecSessionChecked;
+            set
+            {
+                _isRecSessionChecked = value;
+                RaisePropertyChanged(() => IsRecSessionChecked);
+            }
+        }
+
+        private string _firstName;
+        public string FirstName
+        {
+            get => _firstName;
+            set
+            {
+                _firstName = value;
+                RaisePropertyChanged(() => FirstName);
+            }
+        }
+
+        private string _lastName;
+        public string LastName
+        {
+            get => _lastName;
+            set
+            {
+                _lastName = value;
+                RaisePropertyChanged(() => LastName);
+            }
+        }
         #endregion
-        public MainViewModel(IMvxNavigationService navigationService)
+        public MainViewModel(IMvxNavigationService navigationService, ISignalAnalyzer signalAnalyzer, IWavReaderService wavReader)
         {
             _navigationService = navigationService;
-            RecordSoundAsyncCommand = new MvxAsyncCommand(RecordSoundAsync);
+            _signalAnalyzer = signalAnalyzer;
+            _wavReader = wavReader;
+            RecordSoundCommand = new MvxAsyncCommand(RecordSoundAsync);
             OpenFilesExplorerCommand = new MvxAsyncCommand(OpenFilePickerAsync);
             AnalyzeSignalCommand = new MvxAsyncCommand(AnalyzeSignalAsync);
         }
 
         private async Task RecordSoundAsync()
         {
+            var permissionMic = await Permissions.CheckStatusAsync<Permissions.Microphone>();
+            if (permissionMic != PermissionStatus.Granted)
+            {
+                await Permissions.RequestAsync<Permissions.Microphone>();
+                return;
+            }
             DateTime todaysTime = DateTime.Now;
-            var filename = "rec_" + $"{todaysTime:yyyyMMdd}_{todaysTime.Hour}{todaysTime.Minute}{todaysTime.Second}" + ".wav";
-
+            string filename = "";
+            if (IsRecSessionChecked && !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName))
+            {
+                FirstName = FirstName.Trim();
+                LastName = LastName.Trim();
+                filename = $"{FirstName}_" + $"{LastName}_" + $"{todaysTime:yyyyMMdd}_{todaysTime.Hour}{todaysTime.Minute}{todaysTime.Second}" + ".wav";
+            }
+            else if (IsRecSessionChecked && (string.IsNullOrEmpty(FirstName) || string.IsNullOrEmpty(LastName)))
+            {
+                await Mvx.IoCProvider.Resolve<IUserDialogs>().AlertAsync("Pola tekstowe nie mogą być puste!", "Błąd", "Ok");
+                return;
+            }
+            else
+            {
+                filename = "rec_" + $"{todaysTime:yyyyMMdd}_{todaysTime.Hour}{todaysTime.Minute}{todaysTime.Second}" + ".wav";
+            }
             var recorder = new AudioRecorderService()
             {
                 StopRecordingOnSilence = false,
-                TotalAudioTimeout = TimeSpan.FromSeconds(11),
+                TotalAudioTimeout = TimeSpan.FromSeconds(30),
                 StopRecordingAfterTimeout =  true,
-                FilePath = Mvx.IoCProvider.Resolve<ILocalFileHelper>().GetPath(filename),
+                FilePath = IsRecSessionChecked ? Mvx.IoCProvider.Resolve<ILocalFileHelper>().GetPatientPath(filename, FirstName, LastName)
+                    : Mvx.IoCProvider.Resolve<ILocalFileHelper>().GetPath(filename),
+                PreferredSampleRate = 4000,
             };
             Mvx.IoCProvider.Resolve<IUserDialogs>().ShowLoading("Nagrywanie...");
             var recordTask = await recorder.StartRecording();
@@ -86,7 +146,14 @@ namespace InzProjTest.Core.ViewModels.Main
 
         private async Task OpenFilePickerAsync()
         {
-            FileData file = await CrossFilePicker.Current.PickFile();
+            var device = DeviceInfo.Platform;
+            string[] fileTypes = null; //ograniczenie dostępnych rozszerzeń do .wav
+            if (device == DevicePlatform.Android)
+                fileTypes = new string[]{ "audio/x-wav" };
+            if (device == DevicePlatform.iOS)
+                fileTypes = new string[] { "public.wav" };
+
+            FileData file = await CrossFilePicker.Current.PickFile(fileTypes);
             if (file == null)
             {
                 return;
@@ -101,26 +168,28 @@ namespace InzProjTest.Core.ViewModels.Main
                 await Mvx.IoCProvider.Resolve<IUserDialogs>().AlertAsync("Nie wybrano żadnego pliku.", "Błąd odczytu pliku", "OK");
                 return;
             }
-            AudioFileReader reader = new AudioFileReader(FilePath); //DZIAŁA!!!!
-            ISampleProvider isp = reader.ToSampleProvider();
-            float[] buffer = new float[reader.Length / 2];
-            isp.Read(buffer, 0, buffer.Length);
-
-            //todo najblizsza potega dwojki
-            var window = Window.Hamming(16384);
-            Complex32[] fftInput = new Complex32[buffer.Length]; //testowo wersja z oknem
-            for (int i = 0; i < fftInput.Length; i++)
-            {
-                fftInput[i] = new Complex32(buffer[i], 0);
-            }
+            var fftInput = _wavReader.ReadWavFile(FilePath, out var sampleRate);
             Mvx.IoCProvider.Resolve<IUserDialogs>().ShowLoading("Trwa analiza syngału...");
-            await Task.Run(()=>
+            var framedFft = _signalAnalyzer.FrameSignal(fftInput, 10);
+            float[] averagedSignal = new float[framedFft[0].Length];
+            await Task.Run(() =>
             {
-                Fourier.Forward(fftInput, FourierOptions.Matlab);
+                foreach (var signal in framedFft)
+                {
+                    Fourier.Forward(signal, FourierOptions.Matlab);
+                }
+                averagedSignal = _signalAnalyzer.AverageSignal(framedFft);
             });
-            await _navigationService.Navigate<ResultsViewModel, Complex32[]>(fftInput);
+            Signal mySignal = new Signal
+            {
+                Filename = FileName,
+                Filepath = FilePath,
+                Data = averagedSignal,
+                SampleRate = sampleRate,
+            };
             Mvx.IoCProvider.Resolve<IUserDialogs>().HideLoading();
+            await _navigationService.Navigate<ResultsViewModel, Signal>(mySignal);
         }
-        
     }
+    
 }

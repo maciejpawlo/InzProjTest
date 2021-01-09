@@ -21,10 +21,21 @@ namespace InzProjTest.Droid.Services
     {
         public string GetPath(string filename)
         {
-            //var directory = Path.Combine(Android.OS.Environment.ExternalStorageDirectory.AbsolutePath, Android.OS.Environment.DirectoryDownloads);
             var directory = Application.Context.GetExternalFilesDir(null).AbsolutePath;
             var file = Path.Combine(directory, filename);
             return file;
         }
+
+        public string GetPatientPath(string filename, string firstName, string lastName)
+        {
+            var directory = Application.Context.GetExternalFilesDir(null).AbsolutePath;
+            directory = directory + $"/{firstName}{lastName}";
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            var file = Path.Combine(directory, filename);
+            return file;
+        } 
     }
 }
